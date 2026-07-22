@@ -1,3 +1,6 @@
+<?php
+$pageData = include __DIR__ . '/../resources/views/data/public-display-data.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,10 +10,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/public-display.css') }}">
+    <link rel="stylesheet" href="/css/public-display.css">
 </head>
 <body>
-    <?php $pageData = include resource_path('views/data/public-display-data.php'); ?>
-    @include('partials.public-display-content', ['pageData' => $pageData])
+    <?php include __DIR__ . '/../resources/views/partials/public-display-content.php'; ?>
 </body>
 </html>
