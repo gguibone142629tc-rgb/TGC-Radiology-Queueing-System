@@ -8,30 +8,19 @@ return [
     ],
     'time' => date('h:i:s A'),
     'announcement' => [
-        'tag' => 'Announcement',
-        'title' => 'Metal objects',
-        'description' => 'Remove jewelry, hairpins, and metal accessories before your scan.',
-        'dots' => [
-            ['active' => false],
-            ['active' => true],
-            ['active' => false],
-            ['active' => false],
+        'slides' => [
+            '/images/slide1.jpg',
+            '/images/slide2.jpg',
+            '/images/slide3.jpg',
+            '/images/slide4.jpg',
         ],
     ],
     'serving' => [
-        'title' => 'Serving',
-        'ipd' => [
-            'label' => 'IPD',
-            'items' => [
-                ['exam' => 'XRAY', 'code' => 'XR004'],
-                ['exam' => 'UTZ', 'code' => 'UT002'],
-            ],
-        ],
-        'opd' => [
-            'label' => 'OPD',
-            'items' => [
-                ['exam' => 'CTS', 'code' => 'CT001'],
-            ],
+        'title' => 'Now Serving',
+        'items' => [
+            ['exam' => 'XRAY', 'code' => 'XR004', 'patient_type' => 'IPD'],
+            ['exam' => 'UTZ', 'code' => 'UT002', 'patient_type' => 'IPD'],
+            ['exam' => 'CTS', 'code' => 'CT001', 'patient_type' => 'OPD'],
         ],
     ],
     'queues' => [
