@@ -29,21 +29,21 @@ $pageData = $pageData ?? include __DIR__ . '/../data/public-display-data.php';
                 <span class="pulse-dot green"></span>
                 INCOMING
             </div>
-            <div class="incoming-subheader-row">
+            <div class="incoming-boxes-wrapper">
                 <?php foreach ($pageData['queues'] as $queue): ?>
-                    <div class="incoming-subheader-cell"><?= htmlspecialchars($queue['title'], ENT_QUOTES, 'UTF-8') ?></div>
-                <?php endforeach; ?>
-            </div>
-            <div class="incoming-body">
-                <?php for ($i = 0; $i < 5; $i++): ?>
-                    <div class="incoming-row">
-                        <?php foreach ($pageData['queues'] as $queue): ?>
-                            <div class="incoming-cell">
-                                <?= isset($queue['items'][$i]) ? htmlspecialchars($queue['items'][$i]['id'], ENT_QUOTES, 'UTF-8') : '' ?>
-                            </div>
-                        <?php endforeach; ?>
+                    <div class="incoming-box">
+                        <div class="incoming-box-title queue-<?= strtolower($queue['title']) ?>">
+                            <?= htmlspecialchars($queue['title'], ENT_QUOTES, 'UTF-8') ?>
+                        </div>
+                        <div class="incoming-box-body">
+                            <?php for ($i = 0; $i < 5; $i++): ?>
+                                <div class="incoming-box-row">
+                                    <span class="incoming-code"><?= isset($queue['items'][$i]) ? htmlspecialchars($queue['items'][$i]['id'], ENT_QUOTES, 'UTF-8') : '' ?></span>
+                                </div>
+                            <?php endfor; ?>
+                        </div>
                     </div>
-                <?php endfor; ?>
+                <?php endforeach; ?>
             </div>
         </div>
     </div>
@@ -81,19 +81,31 @@ $pageData = $pageData ?? include __DIR__ . '/../data/public-display-data.php';
                 <span class="pulse-dot red"></span>
                 NOW SERVING
             </div>
-            <div class="serving-subheader-row">
-                <div class="serving-subheader-cell">PROCEDURE</div>
-                <div class="serving-subheader-cell text-center">QUEUE NO.</div>
-                <div class="serving-subheader-cell text-right">PATIENT</div>
-            </div>
-            <div class="serving-body">
-                <?php foreach ($pageData['serving']['items'] as $item): ?>
-                    <div class="serving-row">
-                        <div class="serving-cell fw-bold"><?= htmlspecialchars($item['exam'], ENT_QUOTES, 'UTF-8') ?></div>
-                        <div class="serving-cell text-red fw-bold text-center"><?= htmlspecialchars($item['code'], ENT_QUOTES, 'UTF-8') ?></div>
-                        <div class="serving-cell fw-bold text-right"><?= htmlspecialchars($item['patient_type'], ENT_QUOTES, 'UTF-8') ?></div>
+            <div class="serving-columns">
+                <div class="serving-col">
+                    <div class="serving-col-header ipd-header">IPD</div>
+                    <div class="serving-col-body">
+                        <?php foreach ($pageData['serving']['items'] as $item): ?>
+                            <?php if ($item['patient_type'] === 'IPD'): ?>
+                                <div class="serving-col-row">
+                                    <span class="serving-code proc-<?= substr($item['code'], 0, 2) ?>"><?= htmlspecialchars($item['code'], ENT_QUOTES, 'UTF-8') ?></span>
+                                </div>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
                     </div>
-                <?php endforeach; ?>
+                </div>
+                <div class="serving-col">
+                    <div class="serving-col-header opd-header">OPD</div>
+                    <div class="serving-col-body">
+                        <?php foreach ($pageData['serving']['items'] as $item): ?>
+                            <?php if ($item['patient_type'] === 'OPD'): ?>
+                                <div class="serving-col-row">
+                                    <span class="serving-code proc-<?= substr($item['code'], 0, 2) ?>"><?= htmlspecialchars($item['code'], ENT_QUOTES, 'UTF-8') ?></span>
+                                </div>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

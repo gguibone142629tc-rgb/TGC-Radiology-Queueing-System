@@ -26,21 +26,21 @@
                 <span class="pulse-dot green"></span>
                 INCOMING
             </div>
-            <div class="incoming-subheader-row">
+            <div class="incoming-boxes-wrapper">
                 @foreach ($pageData['queues'] as $queue)
-                    <div class="incoming-subheader-cell">{{ $queue['title'] }}</div>
-                @endforeach
-            </div>
-            <div class="incoming-body">
-                @for ($i = 0; $i < 5; $i++)
-                    <div class="incoming-row">
-                        @foreach ($pageData['queues'] as $queue)
-                            <div class="incoming-cell">
-                                {{ isset($queue['items'][$i]) ? $queue['items'][$i]['id'] : '' }}
-                            </div>
-                        @endforeach
+                    <div class="incoming-box">
+                        <div class="incoming-box-title queue-{{ strtolower($queue['title']) }}">
+                            {{ $queue['title'] }}
+                        </div>
+                        <div class="incoming-box-body">
+                            @for ($i = 0; $i < 5; $i++)
+                                <div class="incoming-box-row">
+                                    <span class="incoming-code">{{ isset($queue['items'][$i]) ? $queue['items'][$i]['id'] : '' }}</span>
+                                </div>
+                            @endfor
+                        </div>
                     </div>
-                @endfor
+                @endforeach
             </div>
         </div>
     </div>
@@ -78,19 +78,31 @@
                 <span class="pulse-dot red"></span>
                 NOW SERVING
             </div>
-            <div class="serving-subheader-row">
-                <div class="serving-subheader-cell">PROCEDURE</div>
-                <div class="serving-subheader-cell text-center">QUEUE NO.</div>
-                <div class="serving-subheader-cell text-right">PATIENT</div>
-            </div>
-            <div class="serving-body">
-                @foreach ($pageData['serving']['items'] as $item)
-                    <div class="serving-row">
-                        <div class="serving-cell fw-bold">{{ $item['exam'] }}</div>
-                        <div class="serving-cell text-red fw-bold text-center">{{ $item['code'] }}</div>
-                        <div class="serving-cell fw-bold text-right">{{ $item['patient_type'] }}</div>
+            <div class="serving-columns">
+                <div class="serving-col">
+                    <div class="serving-col-header ipd-header">IPD</div>
+                    <div class="serving-col-body">
+                        @foreach ($pageData['serving']['items'] as $item)
+                            @if ($item['patient_type'] === 'IPD')
+                                <div class="serving-col-row">
+                                    <span class="serving-code proc-{{ substr($item['code'], 0, 2) }}">{{ $item['code'] }}</span>
+                                </div>
+                            @endif
+                        @endforeach
                     </div>
-                @endforeach
+                </div>
+                <div class="serving-col">
+                    <div class="serving-col-header opd-header">OPD</div>
+                    <div class="serving-col-body">
+                        @foreach ($pageData['serving']['items'] as $item)
+                            @if ($item['patient_type'] === 'OPD')
+                                <div class="serving-col-row">
+                                    <span class="serving-code proc-{{ substr($item['code'], 0, 2) }}">{{ $item['code'] }}</span>
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+                </div>
             </div>
         </div>
     </div>
