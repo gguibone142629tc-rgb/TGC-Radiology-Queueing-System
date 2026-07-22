@@ -7,39 +7,36 @@
     <link rel="stylesheet" href="/css/receptionist.css">
 </head>
 <body>
-    <div class="app-shell">
-        <aside class="sidebar" aria-label="Reception navigation">
-            <div class="brand">
-                <div class="brand-mark">TG<span></span></div>
-                <div>
-                    <strong>Tagum Global</strong>
-                    <span>RADIOLOGY QMS</span>
+    <div class="rqs-shell">
+        <aside class="rqs-sidebar" aria-label="Reception navigation">
+            <div class="rqs-brand">
+                <div class="rqs-mark"><span>TG</span></div>
+                <div class="rqs-brand-text">
+                    <div class="l1">Tagum Global</div>
+                    <div class="l2">RADIOLOGY QMS</div>
                 </div>
             </div>
 
-            <nav class="nav-list" aria-label="Main">
-                <button class="nav-item active" data-view="dashboard" type="button">
-                    <span class="nav-icon grid-icon"></span>
-                    Dashboard
+            <nav class="rqs-nav" aria-label="Main">
+                <button class="rqs-nav-item active nav-item" data-view="dashboard" type="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg> Dashboard
                 </button>
-                <button class="nav-item" data-view="reception" type="button">
-                    <span class="nav-icon clipboard-icon"></span>
-                    Reception
+                <button class="rqs-nav-item nav-item" data-view="reception" type="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg> Reception
                 </button>
-                <button class="nav-item" data-view="manage" type="button">
-                    <span class="nav-icon queue-icon"></span>
-                    Manage queue
+                <button class="rqs-nav-item nav-item" data-view="manage" type="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><line x1="10" x2="21" y1="6" y2="6"/><line x1="10" x2="21" y1="12" y2="12"/><line x1="10" x2="21" y1="18" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg> Manage queue
                 </button>
-                <button class="nav-item" data-view="account" type="button">
-                    <span class="nav-icon account-icon"></span>
-                    Account
+                <button class="rqs-nav-item nav-item" data-view="account" type="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg> Account
                 </button>
             </nav>
 
-            <a class="display-link" href="/public-display.php" target="_blank" rel="noopener">
-                <span class="nav-icon display-icon"></span>
-                Open public display
-            </a>
+            <div class="rqs-sidebar-foot">
+                <a class="rqs-mode-btn display-link" href="/public-display.php" target="_blank" rel="noopener">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg> Open public display
+                </a>
+            </div>
         </aside>
 
         <main class="workspace">
@@ -354,33 +351,48 @@
                 const waiting = state.queues[key];
 
                 return `
-                    <section class="panel manage-card">
-                        <div class="queue-card-header">
+                    <section class="panel rqs-exam-col manage-card" style="padding: 18px;">
+                        <div class="rqs-exam-header">
                             <h3>${procedure.name}</h3>
-                            <span>${waiting.length} waiting</span>
+                            <span class="rqs-count-chip">${waiting.length} waiting</span>
                         </div>
 
-                        <div class="serving-box ${serving ? 'has-ticket' : ''}">
-                            ${serving ? `
-                                <strong>${serving.id}</strong>
-                                <span>${serving.patientType}</span>
-                            ` : 'No patient being served'}
-                        </div>
+                        ${serving ? `
+                            <div class="rqs-serving-hero">
+                                <div class="label">Now serving</div>
+                                <div class="num rqs-num">${serving.id}</div>
+                                <span class="category-badge">${serving.patientType}</span>
+                            </div>
+                        ` : `
+                            <div class="rqs-serving-hero">
+                                <div class="none">No patient being served</div>
+                            </div>
+                        `}
 
-                        <div class="action-row">
-                            <button class="secondary-action" type="button" ${serving ? '' : 'disabled'} onclick="completePatient('${key}')">
-                                <span class="check-icon"></span>
-                                Complete
+                        <div class="rqs-action-row">
+                            <button class="secondary-action" type="button" style="flex: 1; justify-content: center;" ${serving ? '' : 'disabled'} onclick="completePatient('${key}')">
+                                <span class="check-icon"></span> Complete
                             </button>
-                            <button class="primary-action small" type="button" ${serving || waiting.length === 0 ? 'disabled' : ''} onclick="callNext('${key}')">
-                                <span class="call-icon"></span>
-                                Call next
+                            <button class="primary-action small" type="button" style="flex: 1; justify-content: center;" ${serving || waiting.length === 0 ? 'disabled' : ''} onclick="callNext('${key}')">
+                                <span class="call-icon"></span> Call next
                             </button>
                         </div>
 
-                        <div class="waiting-title">Waiting List</div>
-                        <div class="waiting-list">
-                            ${waiting.length ? waiting.map((ticket) => renderTicket(ticket, true)).join('') : '<p>Queue is empty</p>'}
+                        <div>
+                            <p class="rqs-group-label" style="margin-bottom: 8px; font-size: 12px; font-weight: 800; color: #59645e; text-transform: uppercase;">Waiting list</p>
+                            ${waiting.length === 0 ? `
+                                <div class="rqs-empty-mini">Queue is empty</div>
+                            ` : `
+                                <div class="rqs-waiting-list">
+                                    ${waiting.map((ticket, index) => `
+                                        <div class="rqs-waiting-row">
+                                            <span class="pos">${index + 1}</span>
+                                            <span class="num rqs-num">${ticket.id}</span>
+                                            <span class="category-badge">${ticket.patientType}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            `}
                         </div>
                     </section>
                 `;
