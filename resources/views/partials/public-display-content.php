@@ -32,7 +32,7 @@ $pageData = $pageData ?? include __DIR__ . '/../data/public-display-data.php';
             <div class="incoming-boxes-wrapper">
                 <?php foreach ($pageData['queues'] as $queue): ?>
                     <div class="incoming-box">
-                        <div class="incoming-box-title queue-<?= strtolower($queue['title']) ?>">
+                        <div class="incoming-box-title queue-<?= str_replace('-', '', strtolower($queue['title'])) ?>">
                             <?= htmlspecialchars($queue['title'], ENT_QUOTES, 'UTF-8') ?>
                         </div>
                         <div class="incoming-box-body">

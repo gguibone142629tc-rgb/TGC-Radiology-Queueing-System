@@ -18,14 +18,14 @@ return [
     'serving' => [
         'title' => 'Now Serving',
         'items' => [
-            ['exam' => 'XRAY', 'code' => 'XR004', 'patient_type' => 'IPD'],
+            ['exam' => 'X-RAY', 'code' => 'XR004', 'patient_type' => 'IPD'],
             ['exam' => 'UTZ', 'code' => 'UT002', 'patient_type' => 'IPD'],
             ['exam' => 'CTS', 'code' => 'CT001', 'patient_type' => 'OPD'],
         ],
     ],
     'queues' => [
         [
-            'title' => 'XRAY',
+            'title' => 'X-RAY',
             'count' => 15,
             'items' => [
                 ['id' => 'XR005', 'type' => 'IPD'],

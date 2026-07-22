@@ -29,7 +29,7 @@
             <div class="incoming-boxes-wrapper">
                 @foreach ($pageData['queues'] as $queue)
                     <div class="incoming-box">
-                        <div class="incoming-box-title queue-{{ strtolower($queue['title']) }}">
+                        <div class="incoming-box-title queue-{{ str_replace('-', '', strtolower($queue['title'])) }}">
                             {{ $queue['title'] }}
                         </div>
                         <div class="incoming-box-body">

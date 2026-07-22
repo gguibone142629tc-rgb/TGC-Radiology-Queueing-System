@@ -10,11 +10,7 @@
     <div class="rqs-shell">
         <aside class="rqs-sidebar" aria-label="Reception navigation">
             <div class="rqs-brand">
-                <div class="rqs-mark"><span>TG</span></div>
-                <div class="rqs-brand-text">
-                    <div class="l1">Tagum Global</div>
-                    <div class="l2">RADIOLOGY QMS</div>
-                </div>
+                <img class="rqs-logo" src="/images/logo.png" alt="Tagum Global Medical Center Logo">
             </div>
 
             <nav class="rqs-nav" aria-label="Main">
@@ -74,58 +70,45 @@
                                 <option value="xray">X-Ray</option>
                                 <option value="ultrasound">Ultrasound</option>
                                 <option value="ctscan">CT Scan</option>
-                                <option value="IPD">IPD</option>
-                                <option value="OPD">OPD</option>
                             </select>
-                        </label>
-                        <label class="search-control">
-                            <span class="search-icon"></span>
-                            <input id="dashboardSearch" type="search" placeholder="Search queue number or patient type">
                         </label>
                     </div>
 
                     <div class="metric-grid">
                         <section class="panel metric-card">
                             <div>
-                                <span class="metric-icon people-icon"></span>
-                                <p>Waiting now</p>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="metric-icon" style="color: var(--green)"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                <p>Total tickets</p>
                             </div>
-                            <strong id="waitingMetric">0</strong>
+                            <strong id="totalTicketsMetric">0</strong>
                         </section>
                         <section class="panel metric-card">
                             <div>
-                                <span class="metric-icon clock-icon"></span>
-                                <p>Being served</p>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="metric-icon" style="color: var(--green)"><path d="M3 3v18h18"/><path d="M7 13h3v5H7z"/><path d="M14 8h3v10h-3z"/></svg>
+                                <p>Busiest category</p>
                             </div>
-                            <strong id="servedMetric">0</strong>
+                            <strong id="busiestCategoryMetric">None</strong>
                         </section>
                         <section class="panel metric-card">
                             <div>
-                                <span class="metric-icon done-icon"></span>
-                                <p>Completed today</p>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="metric-icon" style="color: var(--green)"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+                                <p>Avg per category</p>
                             </div>
-                            <strong id="completedMetric">0</strong>
-                        </section>
-                        <section class="panel metric-card">
-                            <div>
-                                <span class="metric-icon trend-icon"></span>
-                                <p>IPD waiting</p>
-                            </div>
-                            <strong id="ipdMetric">0</strong>
+                            <strong id="averageCategoryMetric">0</strong>
                         </section>
                     </div>
 
                     <div class="analytics-grid">
                         <section class="panel chart-card wide">
                             <div class="section-heading simple">
-                                <h3>Queue Volume by Procedure</h3>
+                                <h3>Queue Analytics</h3>
                             </div>
                             <div class="bar-chart" id="procedureBarChart"></div>
                         </section>
 
                         <section class="panel chart-card">
                             <div class="section-heading simple">
-                                <h3>Patient Category</h3>
+                                <h3>Served Patient Category</h3>
                             </div>
                             <div class="pie-wrap">
                                 <div class="pie-chart" id="patientPieChart"></div>
@@ -135,7 +118,7 @@
 
                         <section class="panel chart-card">
                             <div class="section-heading simple">
-                                <h3>Recent Tickets</h3>
+                                <h3>Completed Tickets</h3>
                             </div>
                             <div class="analytics-table" id="analyticsTable">
                                 <p>No tickets found.</p>
@@ -147,35 +130,38 @@
 
             <section class="view" id="receptionView" aria-labelledby="receptionTitle">
                 <h2 id="receptionTitle" class="sr-only">Reception</h2>
-                <div class="reception-layout">
-                    <section class="panel register-card">
-                        <div class="section-heading simple">
-                            <h3>Register Patient Queue</h3>
-                        </div>
+                    <div class="reception-layout">
+                        <div class="register-layout-group">
+                            <section class="panel register-card" style="margin-bottom: 24px;">
+                                <div class="section-heading simple">
+                                    <h3 class="dark-title">Register Patient Queue</h3>
+                                </div>
 
-                        <div class="field-group">
-                            <p>Procedure Category</p>
-                            <div class="choice-row three">
-                                <button class="choice-btn" data-procedure="xray" type="button">X-Ray</button>
-                                <button class="choice-btn" data-procedure="ultrasound" type="button">Ultrasound</button>
-                                <button class="choice-btn" data-procedure="ctscan" type="button">CT Scan</button>
+                                <div class="field-group">
+                                    <p class="light-label">Procedure Category</p>
+                                    <div class="choice-row">
+                                        <button class="choice-btn" data-procedure="xray" type="button">X-Ray</button>
+                                        <button class="choice-btn" data-procedure="ultrasound" type="button">Ultrasound</button>
+                                        <button class="choice-btn" data-procedure="ctscan" type="button">CT Scan</button>
+                                    </div>
+                                </div>
+
+                                <div class="field-group">
+                                    <p class="light-label">Patient Category</p>
+                                    <div class="choice-row">
+                                        <button class="choice-btn" data-patient="IPD" type="button">In-patient <span>(IPD)</span></button>
+                                        <button class="choice-btn" data-patient="OPD" type="button">Out-patient <span>(OPD)</span></button>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <div class="register-action-area">
+                                <button class="primary-action" id="generateTicket" type="button" disabled>
+                                    Generate queue number
+                                </button>
+                                <p class="form-note" id="formNote">Select a procedure and patient category to continue.</p>
                             </div>
                         </div>
-
-                        <div class="field-group">
-                            <p>Patient Category</p>
-                            <div class="choice-row two">
-                                <button class="choice-btn" data-patient="IPD" type="button">In-patient <span>(IPD)</span></button>
-                                <button class="choice-btn" data-patient="OPD" type="button">Out-patient <span>(OPD)</span></button>
-                            </div>
-                        </div>
-
-                        <button class="primary-action" id="generateTicket" type="button" disabled>
-                            Generate queue number
-                            <span class="arrow-icon"></span>
-                        </button>
-                        <p class="form-note" id="formNote">Select a procedure and patient category to continue.</p>
-                    </section>
 
                     <aside class="panel latest-card">
                         <div class="section-heading simple">
@@ -208,9 +194,9 @@
 
     <script>
         const procedures = {
-            xray: { name: 'X-Ray', shortName: 'XRAY', prefix: 'XR' },
-            ultrasound: { name: 'Ultrasound', shortName: 'UTZ', prefix: 'UT' },
-            ctscan: { name: 'CT Scan', shortName: 'CTS', prefix: 'CT' }
+            xray: { name: 'X-Ray', shortName: 'X-RAY', chartLabel: 'Xray', prefix: 'XR' },
+            ultrasound: { name: 'Ultrasound', shortName: 'UTZ', chartLabel: 'Utz', prefix: 'UT' },
+            ctscan: { name: 'CT Scan', shortName: 'CTS', chartLabel: 'CTS', prefix: 'CT' }
         };
 
         const state = {
@@ -338,9 +324,12 @@
             }
 
             latestTicket.innerHTML = `
-                <strong>${state.latestTicket.id}</strong>
-                <span>${state.latestTicket.procedure}</span>
-                <small>${state.latestTicket.patientType}</small>
+                <div class="ticket-fade">
+                    <span class="ticket-procedure">${state.latestTicket.procedure.toUpperCase()}</span>
+                    <strong>${state.latestTicket.id}</strong>
+                    <small>${state.latestTicket.patientType}</small>
+                    <p>Now waiting · hand this number<br>to the patient</p>
+                </div>
             `;
         }
 
@@ -402,46 +391,73 @@
         function renderDashboard() {
             const monthValue = document.getElementById('monthFilter').value;
             const categoryValue = document.getElementById('categoryFilter').value;
-            const searchValue = document.getElementById('dashboardSearch').value.trim().toLowerCase();
-            const waitingTickets = Object.values(state.queues).flat();
-            const servingItems = Object.values(state.serving).filter(Boolean);
-            const allTickets = state.generatedTickets;
-            const today = new Date().toDateString();
-            const filteredTickets = allTickets.filter((ticket) => {
-                const ticketDate = ticket.completedAt || ticket.createdAt;
+            const filteredGeneratedTickets = filterAnalyticsTickets(state.generatedTickets, monthValue, categoryValue, 'createdAt');
+            const filteredCompletedTickets = filterAnalyticsTickets(state.completed, monthValue, categoryValue, 'completedAt');
+            const generatedCounts = getProcedureCounts(filteredGeneratedTickets);
+            const busiestCategory = Object.entries(generatedCounts)
+                .sort((a, b) => b[1] - a[1])
+                .find((item) => item[1] > 0);
+            const activeCategoryCount = Object.values(generatedCounts).filter((count) => count > 0).length || 3;
+            const averagePerCategory = filteredGeneratedTickets.length / activeCategoryCount;
+
+            document.getElementById('totalTicketsMetric').textContent = filteredGeneratedTickets.length;
+            document.getElementById('busiestCategoryMetric').textContent = busiestCategory
+                ? procedures[busiestCategory[0]].chartLabel
+                : 'None';
+            document.getElementById('averageCategoryMetric').textContent = formatAverage(averagePerCategory);
+
+            renderProcedureChart(filteredGeneratedTickets);
+            renderPatientPie(filteredCompletedTickets);
+            renderAnalyticsTable(filteredCompletedTickets);
+        }
+
+        function filterAnalyticsTickets(tickets, monthValue, categoryValue, dateKey) {
+            return tickets.filter((ticket) => {
+                const ticketDate = ticket[dateKey] || ticket.createdAt;
                 const monthMatches = monthValue === 'all' || ticketDate.getMonth().toString() === monthValue;
                 const categoryMatches = categoryValue === 'all'
                     || ticket.procedureKey === categoryValue
                     || ticket.patientType === categoryValue;
-                const searchMatches = !searchValue
-                    || ticket.id.toLowerCase().includes(searchValue)
-                    || ticket.procedure.toLowerCase().includes(searchValue)
-                    || ticket.patientType.toLowerCase().includes(searchValue);
 
-                return monthMatches && categoryMatches && searchMatches;
+                return monthMatches && categoryMatches;
             });
+        }
 
-            document.getElementById('waitingMetric').textContent = waitingTickets.length;
-            document.getElementById('servedMetric').textContent = servingItems.length;
-            document.getElementById('completedMetric').textContent = state.completed
-                .filter((ticket) => ticket.completedAt.toDateString() === today).length;
-            document.getElementById('ipdMetric').textContent = waitingTickets
-                .filter((ticket) => ticket.patientType === 'IPD').length;
+        function getProcedureCounts(tickets) {
+            return Object.keys(procedures).reduce((counts, key) => {
+                counts[key] = tickets.filter((ticket) => ticket.procedureKey === key).length;
+                return counts;
+            }, {});
+        }
 
-            renderProcedureChart(filteredTickets);
-            renderPatientPie(filteredTickets);
-            renderAnalyticsTable(filteredTickets);
+        function getDailyAverage(tickets, dateKey) {
+            return formatAverage(getDailyAverageNumber(tickets, dateKey));
+        }
+
+        function getDailyAverageNumber(tickets, dateKey) {
+            if (!tickets.length) return 0;
+
+            const dates = new Set(tickets.map((ticket) => (ticket[dateKey] || ticket.createdAt).toDateString()));
+            return tickets.length / dates.size;
+        }
+
+        function formatAverage(value) {
+            return Number(value).toFixed(1).replace('.0', '');
         }
 
         function renderProcedureChart(tickets) {
             const chart = document.getElementById('procedureBarChart');
             const counts = Object.entries(procedures).map(([key, procedure]) => ({
-                label: procedure.shortName,
+                key,
+                label: procedure.chartLabel,
                 count: tickets.filter((ticket) => ticket.procedureKey === key).length
             }));
-            const maxCount = Math.max(4, ...counts.map((item) => item.count));
+            const maxCount = Math.max(4, Math.ceil(Math.max(...counts.map((item) => item.count)) / 10) * 10);
 
             chart.innerHTML = `
+                <div class="chart-legend">
+                    ${counts.map((item) => `<span><i class="${item.key}"></i>${item.label}</span>`).join('')}
+                </div>
                 <div class="chart-scale">
                     ${[4, 3, 2, 1, 0].map((value) => `<span>${Math.round((maxCount / 4) * value)}</span>`).join('')}
                 </div>
@@ -451,7 +467,7 @@
                         ${counts.map((item) => `
                             <div class="bar-item">
                                 <div class="bar-track">
-                                    <span style="height: ${maxCount ? (item.count / maxCount) * 100 : 0}%"></span>
+                                    <span class="${item.key}" style="--bar-height: ${maxCount ? (item.count / maxCount) * 100 : 0}%"></span>
                                 </div>
                                 <strong>${item.label}</strong>
                             </div>
@@ -491,13 +507,11 @@
                         <small>${ticket.patientType}</small>
                     </div>
                 `).join('')
-                : '<p>No tickets found.</p>';
+                : '<p>No completed tickets found.</p>';
         }
 
         document.getElementById('monthFilter').addEventListener('change', renderDashboard);
         document.getElementById('categoryFilter').addEventListener('change', renderDashboard);
-        document.getElementById('dashboardSearch').addEventListener('input', renderDashboard);
-
         render();
     </script>
 </body>
