@@ -107,3 +107,112 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const storageKey = 'radiologyQueueState';
+        const procedures = {
+            xray: { title: 'X-RAY', spokenName: 'X-Ray', codeClass: 'XR' },
+            ultrasound: { title: 'UTZ', spokenName: 'Ultrasound', codeClass: 'UT' },
+            ctscan: { title: 'CTS', spokenName: 'CT Scan', codeClass: 'CT' }
+        };
+        let audioEnabled = true;
+        let lastServingIds = {};
+
+        function getQueueState() {
+            try {
+                return JSON.parse(localStorage.getItem(storageKey) || '{}');
+            } catch (error) {
+                return {};
+            }
+        }
+
+        function renderIncoming(queues) {
+            const wrapper = document.querySelector('.incoming-boxes-wrapper');
+            if (!wrapper || !queues) return;
+
+            wrapper.innerHTML = Object.entries(procedures).map(([key, procedure]) => {
+                const items = Array.isArray(queues[key]) ? queues[key].slice(0, 5) : [];
+                const rows = Array.from({ length: 5 }, (_, index) => `
+                    <div class="incoming-box-row">
+                        <span class="incoming-code">${items[index]?.id || ''}</span>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="incoming-box">
+                        <div class="incoming-box-title queue-${key === 'ctscan' ? 'cts' : key === 'ultrasound' ? 'utz' : 'xray'}">
+                            ${procedure.title}
+                        </div>
+                        <div class="incoming-box-body">${rows}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderServing(serving) {
+            const ipdBody = document.querySelector('.ipd-header')?.nextElementSibling;
+            const opdBody = document.querySelector('.opd-header')?.nextElementSibling;
+            if (!ipdBody || !opdBody || !serving) return;
+
+            const items = Object.entries(procedures)
+                .map(([key, procedure]) => ({ ticket: serving[key], procedure }))
+                .filter((item) => item.ticket);
+
+            const buildRows = (patientType) => {
+                const rows = items
+                    .filter((item) => item.ticket.patientType === patientType)
+                    .map((item) => `
+                        <div class="serving-col-row">
+                            <span class="serving-code proc-${item.procedure.codeClass}">${item.ticket.id}</span>
+                        </div>
+                    `).join('');
+
+                return rows || '<div class="serving-col-row"><span class="serving-code empty-code">-</span></div>';
+            };
+
+            ipdBody.innerHTML = buildRows('IPD');
+            opdBody.innerHTML = buildRows('OPD');
+            announceServingChanges(serving);
+        }
+
+        function getSpokenTicketId(ticketId) {
+            return String(ticketId).replace(/([A-Z])/g, '$1 ').replace(/(\d)/g, '$1 ').replace(/\s+/g, ' ').trim();
+        }
+
+        function speakAnnouncement(ticket, procedure) {
+            if (!audioEnabled || !('speechSynthesis' in window)) return;
+
+            const message = `Queue number ${getSpokenTicketId(ticket.id)}, please proceed to ${procedure.spokenName}.`;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(message);
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function announceServingChanges(serving) {
+            Object.entries(procedures).forEach(([key, procedure]) => {
+                const ticket = serving[key];
+                const currentId = ticket?.id || '';
+                const previousId = lastServingIds[key] || '';
+
+                if (currentId && currentId !== previousId) {
+                    speakAnnouncement(ticket, procedure);
+                }
+
+                lastServingIds[key] = currentId;
+            });
+        }
+
+        function refreshDisplayFromReception() {
+            const state = getQueueState();
+            renderIncoming(state.queues);
+            renderServing(state.serving);
+        }
+
+        refreshDisplayFromReception();
+        setInterval(refreshDisplayFromReception, 1000);
+        window.addEventListener('storage', refreshDisplayFromReception);
+    });
+</script>

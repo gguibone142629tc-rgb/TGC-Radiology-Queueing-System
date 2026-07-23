@@ -23,9 +23,6 @@
                 <button class="rqs-nav-item nav-item" data-view="manage" type="button">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><line x1="10" x2="21" y1="6" y2="6"/><line x1="10" x2="21" y1="12" y2="12"/><line x1="10" x2="21" y1="18" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg> Manage queue
                 </button>
-                <button class="rqs-nav-item nav-item" data-view="account" type="button">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg> Account
-                </button>
             </nav>
 
             <div class="rqs-sidebar-foot">
@@ -39,6 +36,10 @@
             <header class="page-header">
                 <p>RADIOLOGY QUEUE MANAGEMENT SYSTEM</p>
                 <h1 id="pageTitle">Dashboard</h1>
+                <div class="header-clock" aria-hidden="false">
+                    <div id="headerDate" class="header-date-text">--</div>
+                    <div id="headerTime" class="header-time-text">--:--:--</div>
+                </div>
             </header>
 
             <section class="view active" id="dashboardView" aria-labelledby="dashboardTitle">
@@ -74,7 +75,9 @@
                         </label>
                     </div>
 
-                    <div class="metric-grid">
+                    <div class="analytics-layout">
+                        <div class="analytics-main-col">
+                        <div class="metric-grid">
                         <section class="panel metric-card">
                             <div>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="metric-icon" style="color: var(--green)"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -96,16 +99,16 @@
                             </div>
                             <strong id="averageCategoryMetric">0</strong>
                         </section>
-                    </div>
+                        </div>
 
-                    <div class="analytics-grid">
-                        <section class="panel chart-card wide">
+                        <section class="panel chart-card queue-analytics-card">
                             <div class="section-heading simple">
                                 <h3>Queue Analytics</h3>
                             </div>
                             <div class="bar-chart" id="procedureBarChart"></div>
                         </section>
 
+                        <div class="analytics-secondary">
                         <section class="panel chart-card">
                             <div class="section-heading simple">
                                 <h3>Served Patient Category</h3>
@@ -124,6 +127,23 @@
                                 <p>No tickets found.</p>
                             </div>
                         </section>
+                        </div>
+                        </div>
+
+                        <div class="live-monitor-side">
+                            <section class="panel live-monitor" id="liveMonitorCompact">
+                                <div class="live-monitor-header">
+                                    <h3>Live Queue Monitor</h3>
+                                    <span class="live-status"><i></i>Live</span>
+                                </div>
+                                <div class="live-monitor-body">
+                                    <div class="monitor-simple">
+                                        <div class="monitor-title">Now Serving</div>
+                                        <ul class="monitor-simple-list" id="monitorSimpleNow"></ul>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -221,6 +241,48 @@
                 ctscan: 0
             }
         };
+        const STORAGE_KEY = 'radiologyQueueState';
+
+        function parseTicketDates(ticket) {
+            return {
+                ...ticket,
+                createdAt: ticket.createdAt ? new Date(ticket.createdAt) : new Date(),
+                completedAt: ticket.completedAt ? new Date(ticket.completedAt) : undefined
+            };
+        }
+
+        function loadSavedState() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+                if (!saved || typeof saved !== 'object') return;
+
+                state.latestTicket = saved.latestTicket ? parseTicketDates(saved.latestTicket) : null;
+                state.completed = Array.isArray(saved.completed) ? saved.completed.map(parseTicketDates) : [];
+                state.generatedTickets = Array.isArray(saved.generatedTickets) ? saved.generatedTickets.map(parseTicketDates) : [];
+
+                Object.keys(procedures).forEach((key) => {
+                    state.queues[key] = Array.isArray(saved.queues?.[key])
+                        ? saved.queues[key].map(parseTicketDates)
+                        : [];
+                    state.serving[key] = saved.serving?.[key] ? parseTicketDates(saved.serving[key]) : null;
+                    state.counters[key] = Number(saved.counters?.[key] || 0);
+                });
+            } catch (error) {
+                console.warn('Unable to load saved queue state.', error);
+            }
+        }
+
+        function saveQueueState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                latestTicket: state.latestTicket,
+                completed: state.completed,
+                generatedTickets: state.generatedTickets,
+                queues: state.queues,
+                serving: state.serving,
+                counters: state.counters,
+                updatedAt: new Date().toISOString()
+            }));
+        }
 
         const navItems = document.querySelectorAll('.nav-item');
         const views = document.querySelectorAll('.view');
@@ -314,14 +376,22 @@
             renderLatestTicket();
             renderManageQueue();
             renderDashboard();
+            renderLiveMonitor();
+            saveQueueState();
         }
 
         function renderLatestTicket() {
             const latestTicket = document.getElementById('latestTicket');
             if (!state.latestTicket) {
+                // remove any procedure class when empty
+                ['xray','ultrasound','ctscan'].forEach(k => latestTicket.classList.remove('proc-' + k));
                 latestTicket.innerHTML = '<p>No ticket generated yet this session.</p>';
                 return;
             }
+
+            // ensure latestTicket has a procedure-specific class so we can style it
+            ['xray','ultrasound','ctscan'].forEach(k => latestTicket.classList.remove('proc-' + k));
+            latestTicket.classList.add('proc-' + state.latestTicket.procedureKey);
 
             latestTicket.innerHTML = `
                 <div class="ticket-fade">
@@ -347,13 +417,13 @@
                         </div>
 
                         ${serving ? `
-                            <div class="rqs-serving-hero">
+                            <div class="rqs-serving-hero proc-${key}">
                                 <div class="label">Now serving</div>
                                 <div class="num rqs-num">${serving.id}</div>
                                 <span class="category-badge">${serving.patientType}</span>
                             </div>
                         ` : `
-                            <div class="rqs-serving-hero">
+                            <div class="rqs-serving-hero proc-${key}">
                                 <div class="none">No patient being served</div>
                             </div>
                         `}
@@ -510,8 +580,42 @@
                 : '<p>No completed tickets found.</p>';
         }
 
+        // Live monitor rendering: compact 'Now Serving' card used on dashboard
+        function renderLiveMonitor() {
+            const simple = document.getElementById('monitorSimpleNow');
+            if (!simple) return;
+
+            simple.innerHTML = Object.entries(procedures).map(([key, procedure]) => {
+                const serving = state.serving[key];
+                const id = serving ? serving.id : '-';
+                return `
+                    <li class="monitor-simple-row">
+                        <span class="proc-name proc-${key}">${procedure.shortName}</span>
+                        <span class="proc-id proc-${key}">${id}</span>
+                    </li>
+                `;
+            }).join('');
+        }
+
         document.getElementById('monthFilter').addEventListener('change', renderDashboard);
         document.getElementById('categoryFilter').addEventListener('change', renderDashboard);
+
+        // Header clock: update date and time in the top-right header
+        function updateHeaderClock() {
+            const dElem = document.getElementById('headerDate');
+            const tElem = document.getElementById('headerTime');
+            if (!dElem || !tElem) return;
+            const now = new Date();
+            const dateStr = now.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+            const timeStr = now.toLocaleTimeString();
+            dElem.textContent = dateStr;
+            tElem.textContent = timeStr;
+        }
+
+        updateHeaderClock();
+        setInterval(updateHeaderClock, 1000);
+
+        loadSavedState();
         render();
     </script>
 </body>
