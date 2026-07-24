@@ -119,14 +119,6 @@
                             </div>
                         </section>
 
-                        <section class="panel chart-card">
-                            <div class="section-heading simple">
-                                <h3>Completed Tickets</h3>
-                            </div>
-                            <div class="analytics-table" id="analyticsTable">
-                                <p>No tickets found.</p>
-                            </div>
-                        </section>
                         </div>
                         </div>
 
@@ -239,7 +231,9 @@
                 xray: 0,
                 ultrasound: 0,
                 ctscan: 0
-            }
+            },
+            callSequence: 0,
+            calledTickets: []
         };
         const STORAGE_KEY = 'radiologyQueueState';
 
@@ -247,8 +241,44 @@
             return {
                 ...ticket,
                 createdAt: ticket.createdAt ? new Date(ticket.createdAt) : new Date(),
+                calledAt: ticket.calledAt ? new Date(ticket.calledAt) : undefined,
+                calledOrder: Number(ticket.calledOrder || 0),
                 completedAt: ticket.completedAt ? new Date(ticket.completedAt) : undefined
             };
+        }
+
+        function getTicketNumberValue(ticket) {
+            const match = String(ticket?.id || '').match(/\d+/);
+            return match ? Number(match[0]) : Number.MAX_SAFE_INTEGER;
+        }
+
+        function migrateServingCallOrder() {
+            state.callSequence = Math.max(
+                Number(state.callSequence || 0),
+                ...Object.values(state.serving).filter(Boolean).map((ticket) => Number(ticket.calledOrder || 0)),
+                ...state.calledTickets.map((ticket) => Number(ticket.calledOrder || 0))
+            );
+
+            Object.entries(state.serving)
+                .filter(([, ticket]) => ticket && !ticket.calledOrder)
+                .sort((a, b) => {
+                    const aTime = a[1].calledAt ? a[1].calledAt.getTime() : 0;
+                    const bTime = b[1].calledAt ? b[1].calledAt.getTime() : 0;
+                    if (aTime && bTime && aTime !== bTime) return aTime - bTime;
+                    return getTicketNumberValue(a[1]) - getTicketNumberValue(b[1]);
+                })
+                .forEach(([key]) => {
+                    state.callSequence += 1;
+                    state.serving[key].calledOrder = state.callSequence;
+                    if (!state.serving[key].calledAt) {
+                        state.serving[key].calledAt = new Date();
+                    }
+                    state.calledTickets.push({
+                        id: state.serving[key].id,
+                        procedureKey: key,
+                        calledOrder: state.serving[key].calledOrder
+                    });
+                });
         }
 
         function loadSavedState() {
@@ -259,6 +289,8 @@
                 state.latestTicket = saved.latestTicket ? parseTicketDates(saved.latestTicket) : null;
                 state.completed = Array.isArray(saved.completed) ? saved.completed.map(parseTicketDates) : [];
                 state.generatedTickets = Array.isArray(saved.generatedTickets) ? saved.generatedTickets.map(parseTicketDates) : [];
+                state.callSequence = Number(saved.callSequence || 0);
+                state.calledTickets = Array.isArray(saved.calledTickets) ? saved.calledTickets : [];
 
                 Object.keys(procedures).forEach((key) => {
                     state.queues[key] = Array.isArray(saved.queues?.[key])
@@ -267,6 +299,7 @@
                     state.serving[key] = saved.serving?.[key] ? parseTicketDates(saved.serving[key]) : null;
                     state.counters[key] = Number(saved.counters?.[key] || 0);
                 });
+                migrateServingCallOrder();
             } catch (error) {
                 console.warn('Unable to load saved queue state.', error);
             }
@@ -280,6 +313,8 @@
                 queues: state.queues,
                 serving: state.serving,
                 counters: state.counters,
+                callSequence: state.callSequence,
+                calledTickets: state.calledTickets,
                 updatedAt: new Date().toISOString()
             }));
         }
@@ -349,7 +384,17 @@
 
         function callNext(key) {
             if (state.serving[key] || state.queues[key].length === 0) return;
-            state.serving[key] = state.queues[key].shift();
+            state.callSequence += 1;
+            state.serving[key] = {
+                ...state.queues[key].shift(),
+                calledAt: new Date(),
+                calledOrder: state.callSequence
+            };
+            state.calledTickets.push({
+                id: state.serving[key].id,
+                procedureKey: key,
+                calledOrder: state.serving[key].calledOrder
+            });
             render();
         }
 
@@ -478,7 +523,6 @@
 
             renderProcedureChart(filteredGeneratedTickets);
             renderPatientPie(filteredCompletedTickets);
-            renderAnalyticsTable(filteredCompletedTickets);
         }
 
         function filterAnalyticsTickets(tickets, monthValue, categoryValue, dateKey) {
@@ -563,21 +607,6 @@
                 <div><span class="legend-dot maroon"></span>IPD <strong>${ipd}</strong></div>
                 <div><span class="legend-dot green"></span>OPD <strong>${opd}</strong></div>
             `;
-        }
-
-        function renderAnalyticsTable(tickets) {
-            const table = document.getElementById('analyticsTable');
-            const visibleTickets = [...tickets].reverse().slice(0, 6);
-
-            table.innerHTML = visibleTickets.length
-                ? visibleTickets.map((ticket) => `
-                    <div class="analytics-row">
-                        <strong>${ticket.id}</strong>
-                        <span>${ticket.procedure}</span>
-                        <small>${ticket.patientType}</small>
-                    </div>
-                `).join('')
-                : '<p>No completed tickets found.</p>';
         }
 
         // Live monitor rendering: compact 'Now Serving' card used on dashboard

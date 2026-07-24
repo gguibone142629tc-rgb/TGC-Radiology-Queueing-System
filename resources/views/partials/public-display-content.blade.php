@@ -33,7 +33,7 @@
                             {{ $queue['title'] }}
                         </div>
                         <div class="incoming-box-body">
-                            @for ($i = 0; $i < 5; $i++)
+                            @for ($i = 0; $i < 4; $i++)
                                 <div class="incoming-box-row">
                                     <span class="incoming-code">{{ isset($queue['items'][$i]) ? $queue['items'][$i]['id'] : '' }}</span>
                                 </div>
@@ -112,8 +112,8 @@
         const storageKey = 'radiologyQueueState';
         const procedures = {
             xray: { title: 'X-RAY', spokenName: 'X-Ray', codeClass: 'XR' },
-            ultrasound: { title: 'UTZ', spokenName: 'Ultrasound', codeClass: 'UT' },
-            ctscan: { title: 'CTS', spokenName: 'CT Scan', codeClass: 'CT' }
+            ultrasound: { title: 'Ultrasound', spokenName: 'Ultrasound', codeClass: 'UT' },
+            ctscan: { title: 'CT-Scan', spokenName: 'CT Scan', codeClass: 'CT' }
         };
         let audioEnabled = true;
         let lastServingIds = {};
@@ -131,8 +131,8 @@
             if (!wrapper || !queues) return;
 
             wrapper.innerHTML = Object.entries(procedures).map(([key, procedure]) => {
-                const items = Array.isArray(queues[key]) ? queues[key].slice(0, 5) : [];
-                const rows = Array.from({ length: 5 }, (_, index) => `
+                const items = Array.isArray(queues[key]) ? queues[key].slice(0, 4) : [];
+                const rows = Array.from({ length: 4 }, (_, index) => `
                     <div class="incoming-box-row">
                         <span class="incoming-code">${items[index]?.id || ''}</span>
                     </div>
@@ -149,14 +149,28 @@
             }).join('');
         }
 
-        function renderServing(serving) {
+        function getTicketNumberValue(ticket) {
+            const match = String(ticket?.id || '').match(/\d+/);
+            return match ? Number(match[0]) : Number.MAX_SAFE_INTEGER;
+        }
+
+        function getServingOrder(item, history) {
+            const historyItem = history.find((ticket) => ticket.id === item.ticket.id);
+            if (historyItem?.calledOrder) return Number(historyItem.calledOrder);
+            if (item.ticket.calledOrder) return Number(item.ticket.calledOrder);
+            if (item.ticket.calledAt) return new Date(item.ticket.calledAt).getTime();
+            return getTicketNumberValue(item.ticket);
+        }
+
+        function renderServing(serving, history = []) {
             const ipdBody = document.querySelector('.ipd-header')?.nextElementSibling;
             const opdBody = document.querySelector('.opd-header')?.nextElementSibling;
             if (!ipdBody || !opdBody || !serving) return;
 
             const items = Object.entries(procedures)
                 .map(([key, procedure]) => ({ ticket: serving[key], procedure }))
-                .filter((item) => item.ticket);
+                .filter((item) => item.ticket)
+                .sort((a, b) => getServingOrder(a, history) - getServingOrder(b, history));
 
             const buildRows = (patientType) => {
                 const rows = items
@@ -208,7 +222,7 @@
         function refreshDisplayFromReception() {
             const state = getQueueState();
             renderIncoming(state.queues);
-            renderServing(state.serving);
+            renderServing(state.serving, Array.isArray(state.calledTickets) ? state.calledTickets : []);
         }
 
         refreshDisplayFromReception();

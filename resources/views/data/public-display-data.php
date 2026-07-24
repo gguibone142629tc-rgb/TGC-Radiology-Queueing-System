@@ -19,8 +19,8 @@ return [
         'title' => 'Now Serving',
         'items' => [
             ['exam' => 'X-RAY', 'code' => 'XR004', 'patient_type' => 'IPD'],
-            ['exam' => 'UTZ', 'code' => 'UT002', 'patient_type' => 'IPD'],
-            ['exam' => 'CTS', 'code' => 'CT001', 'patient_type' => 'OPD'],
+            ['exam' => 'Ultrasound', 'code' => 'UT002', 'patient_type' => 'IPD'],
+            ['exam' => 'CT-Scan', 'code' => 'CT001', 'patient_type' => 'OPD'],
         ],
     ],
     'queues' => [
@@ -46,7 +46,7 @@ return [
             ],
         ],
         [
-            'title' => 'UTZ',
+            'title' => 'Ultrasound',
             'count' => 8,
             'items' => [
                 ['id' => 'UT003', 'type' => 'IPD'],
@@ -60,7 +60,7 @@ return [
             ],
         ],
         [
-            'title' => 'CTS',
+            'title' => 'CT-Scan',
             'count' => 12,
             'items' => [
                 ['id' => 'CT002', 'type' => 'IPD'],

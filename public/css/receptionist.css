@@ -517,13 +517,9 @@ a {
     grid-column: 1;
     grid-row: 3;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.9fr);
+    grid-template-columns: minmax(0, 1fr);
     gap: 16px;
     align-items: start;
-}
-
-.analytics-secondary .chart-card:last-child {
-    min-width: 300px;
 }
 
 .live-monitor-side {
@@ -549,18 +545,30 @@ a {
     justify-content: center;
     padding: 7px 12px;
     border-radius: 999px;
-    color: #fff;
     font-size: 13px;
     font-weight: 800;
     letter-spacing: 0.2px;
+    border: 1px solid transparent;
 }
-.monitor-simple-row .proc-name.proc-xray { background: #a01f36; }
-.monitor-simple-row .proc-name.proc-ultrasound { background: #f0642f; }
-.monitor-simple-row .proc-name.proc-ctscan { background: #2f7ed8; }
-.monitor-simple-row .proc-id { font-weight: 800; }
-.monitor-simple-row .proc-id.proc-xray { color: #a01f36; }
-.monitor-simple-row .proc-id.proc-ultrasound { color: #f0642f; }
-.monitor-simple-row .proc-id.proc-ctscan { color: #2f7ed8; }
+.monitor-simple-row .proc-name.proc-xray {
+    color: #a01f36;
+    border-color: rgba(160, 31, 54, 0.25);
+    background: rgba(160, 31, 54, 0.06);
+}
+.monitor-simple-row .proc-name.proc-ultrasound {
+    color: #f0642f;
+    border-color: rgba(240, 100, 47, 0.25);
+    background: rgba(240, 100, 47, 0.06);
+}
+.monitor-simple-row .proc-name.proc-ctscan {
+    color: #2f7ed8;
+    border-color: rgba(47, 126, 216, 0.25);
+    background: rgba(47, 126, 216, 0.06);
+}
+.monitor-simple-row .proc-id {
+    color: #111;
+    font-weight: 800;
+}
 
 /* Live monitor styles */
 .live-monitor { padding: 14px; border-radius: 12px; }
